@@ -23,10 +23,6 @@ jobs:
         with:
           node-version: '16'  # Specify the version of Node.js you want to use
 
-      # Install dependencies (if needed)
-      - name: Install dependencies
-        run: |
-          npm install  # Use npm to install dependencies
 
       # Run Postman tests using Newman
       - name: Run Postman tests using Newman
