@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: test-report
-          path: C:\Users\Administrator\Desktop\CICDTEST\ResolveNewmanReport.html
+          path: C:\Users\Administrator\Desktop\CICDTEST
