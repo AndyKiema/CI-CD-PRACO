@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '16'  # Specify the version of Node.js you want 
 
-      - name: Install dependencies
+      - name: Install dependency
         run: |
             npm install -g newman
             npm install -g newman-reporter-htmlextra
