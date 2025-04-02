@@ -32,7 +32,7 @@ jobs:
       - name: Run Postman tests using Newman
         run: |
           npm install -g newman  # Install Newman globally if it's not already installed
-          newman run ResolveNewmanReport.html # Run your Postman collection file here
+          newman run  "PROJECT_RESOLVE.postman_collection" -r htmlextra --reporter-htmlextra-export ResolveNewmanReport.html
 
       # Upload the test report as an artifact
       - name: Upload Test Report
