@@ -1,0 +1,3281 @@
+{
+	"info": {
+		"_postman_id": "25005878-8975-43d1-974d-b7028a49bdc6",
+		"name": "PROJECT_RESOLVE",
+		"description": "This Postman collection contains API requests for various core functionalities in V1.0, including user authentication, election and voting links. It covers essential operations such as user login, sign up, election creation and so on. The collection is structured to test both positive and negative scenarios to ensure that each API functions correctly under a range of conditions.\n\nLink - [Swagger Documentation](https://api.staging.resolve.vote/api/docs#/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43154376",
+		"_collection_link": "https://resolve-testers.postman.co/workspace/Team-Workspace~78862842-e51b-4d40-889f-0943e3a71e62/collection/43153869-25005878-8975-43d1-974d-b7028a49bdc6?action=share&source=collection_link&creator=43154376"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register_Admin with valid credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse = pm.response.json();\r",
+									"pm.test(\"The status code for the response is 201\",()=>{\r",
+									"    pm.response.to.have.status(201);\r",
+									"})\r",
+									"pm.test(\"The response includes a message stating that the signup is successful and the data of the new admin\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"data\");\r",
+									"    pm.expect(jsonResponse.data).to.have.property(\"id\");\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Signup successful\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"window={}\r",
+									"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", function (err, res) {\r",
+									"    if (!err) {  \r",
+									"        eval(res.text());  // Load Faker.js ONLY if there's no error\r",
+									"        window.faker.locale=\"en\"\r",
+									"        // Generate random username & password\r",
+									"        pm.collectionVariables.set(\"newEmail\", window.faker.internet.email());\r",
+									"    } \r",
+									"});\r",
+									"        \r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "d",
+								"value": "\"\"",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{newEmail}}\",\r\n  \"password\": \"Ray1234#!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/signup",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin with existing email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"Error message should indicate Email already in use\", function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.status_code).to.eql(400);\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Email already in use\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\": \"USER@examplE.com\",\r\n     \"password\": \"P@ssw0rd!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/signup",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin with Invalid Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"Error message should indicate email must be an email\", function () {\r",
+									"    const jsonResponse = pm.response.json()\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.status_code).to.eql(400);\r",
+									"    pm.expect(jsonResponse.message).to.include(\"email must be an email\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\": \"ladybug@.com\", \r\n     \"password\": \"P@ssw0rd!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}api/v1/auth/signup",
+							"host": [
+								"{{baseUrl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin with Weak Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"Error message should indicate password must be at least 8 characters long and contain at least one number and one special character \",\"password must be longer than or equal to 8 chracters\", function () {\r",
+									"    const jsonResponse = pm.response.json()\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.status.code).to.eql(\"Bad Request\");\r",
+									"    pm.expect(jsonResponse.message).to.include(\r",
+									"        \"Password must be at least 8 characters long and contain at least one number and one special character\",\r",
+									"        \"password must be longer than or equal to 8 characters\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"secureUser@example.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/signup",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin with Missing Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"Error message should indicate email must be an email\",\"password must be at least 8 characters long and contain at least one number and one special character\",\"password should not be empty\", \"password must be longer than or equal to 8 characters\", function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.status_code).to.eql(\"Bad Request\");\r",
+									"    pm.expect(jsonResponse.message).to.include(\"email must be an email\",\"password must be at least 8 characters long and contain at least one number and one special character\",\"password should not be empty\", \"password must be longer than or equal to 8 characters\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/signup",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login with valid credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 200\",()=>{\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"pm.test(\"The response contains a message key with the value 'Successfully logged in' and includes the data of the authenticated admin\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"data\");\r",
+									"    pm.expect(jsonResponse.data).to.have.property(\"id\");\r",
+									"       // pm.expect(jsonResponse.data.email).to.eql(\"user@example.com\");\r",
+									"    pm.expect(jsonResponse.data).to.have.property(\"token\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbWl0b3Bla2FyZWVtMTQyQGdtYWlsLmNvbSIsInN1YiI6IjU3NDBkN2Q4LTgzNDUtNDYxZS1hMmRmLTRkYmM1OWQwMzExNSIsImlhdCI6MTc0MzE1MzEzMSwiZXhwIjoxNzQ1NzQ1MTMxfQ.wZR63Gc4t1KhG6shvLxxCq2r9vdLQXg1H9RmlX_BTkY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"turpsee003@gmail.com\",\r\n  \"password\": \"p@ssw0rd!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.staging.resolve.vote/api/v1/auth/login",
+							"protocol": "https",
+							"host": [
+								"api",
+								"staging",
+								"resolve",
+								"vote"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login with wrong email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with an array value of 'Please provide a valid email'\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message[0]).to.eql(\"Please provide a valid email.\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"beccaoluseg@gmail.com\",\r\n  \"password\": \"Becca1234#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login with wrong password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with a value of 'Incorrect credentials'\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Incorrect credentials\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"beccaolusegun@gmail.com\",\r\n  \"password\": \"Becci1234#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login with unregistered email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"Error message should indicate 'User with this email not found'\",function() {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    \r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"emily@gmail.com\",\r\n  \"password\": \"p@ssw0rd!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login without email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with values of  'Please provide a valid email.' and 'Email is required''\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message[0]).to.eql(\"Please provide a valid email.\");\r",
+									"    pm.expect(jsonResponse.message[1]).to.eql(\"Email is required\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"password\": \"p@ssw0rd!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login without password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with values of  'Password minimum character should be 8.' and 'Password is required''\",()=>{\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message[0]).to.eql(\"Password minimum character should be 8.\");\r",
+									"    pm.expect(jsonResponse.message[1]).to.eql(\"Password is required\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"beccaolusegun@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login without email and password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 400\",()=>{\r",
+									"    pm.response.to.have.status(400);\r",
+									"})\r",
+									"pm.test(\"Error message indicating 'Email is required' and 'Password is required'\",function() {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"status_code\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message[1]).to.eql(\"Email is required\");\r",
+									"    pm.expect(jsonResponse.message[3]).to.eql(\"Password is required\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/login",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 200\",()=>{\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with the value 'Admins fetched successfully'\",function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.data.admins).to.be.an(\"array\").that.is.not.empty\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Admins fetched successfully\");\r",
+									"})\r",
+									"\r",
+									"pm.collectionVariables.set(\"useridvariable\",jsonResponse.data.admins[0].id, );\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_users_noaccesstoken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with the value 'Not an authenticated user'\",function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Not an authenticated user\");\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User_By_ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse = pm.response.json();\r",
+									"pm.test(\"The status code for the response is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'User fetched successfully'\",function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User fetched successfully\");\r",
+									"    \r",
+									"    \r",
+									"\r",
+									"\r",
+									"})\r",
+									"    \r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkNoZXQuVG9ycEBob3RtYWlsLmNvbSIsInN1YiI6ImMwMGIyNDZjLTE4ZDktNGM3Ni04NGY5LWU0NjkxM2YwOTU5NCIsImlhdCI6MTc0MTYzNTEwNiwiZXhwIjoxNzQ0MjI3MTA2fQ.buhAvrUkLvFOom8PYDQ834_d-DEYLMS4TTbGIOYW1yY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/add8307b-4150-4189-978b-be8760560d22",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"add8307b-4150-4189-978b-be8760560d22"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_userbyid_noaccesstoken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with the value 'Not an authenticated user'\",function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Not an authenticated user\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/add8307b-4150-4189-978b-be8760560d22",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"add8307b-4150-4189-978b-be8760560d22"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_userbyid_nonexistentid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"pm.test(\"The response includea message key with the value 'User not found'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User not found\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/a1cb61be-4184-491f-81d0-a60d50651e57",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"a1cb61be-4184-491f-81d0-a60d50651e57"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a user by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'User Updated Successfully'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User Updated Successfully\")\r",
+									"    \r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"first_name\": \"Becca\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/user/592b89cc-b47c-405d-a0cc-d3f9e50c7fa9",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"user",
+								"592b89cc-b47c-405d-a0cc-d3f9e50c7fa9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_user_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response includes a message key with the value 'User deleted successfully'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User deleted successfully\")\r",
+									"    \r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/{{useridvariable}}",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"{{useridvariable}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_user_nonexistentid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"pm.test(\"The response includea message key with the value 'User not found'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User not found\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/a1cb61be-4184-491f-81d0-a60d50651e57",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"a1cb61be-4184-491f-81d0-a60d50651e57"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_user_noaccesstoken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"The status code for the response is 401\",()=>{\r",
+									"    pm.response.to.have.status(401);\r",
+									"})\r",
+									"pm.test(\"The response includes a message key with the value 'Not an authenticated user'\",function () {\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Not an authenticated user\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/{{useriddelete}}",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"{{useriddelete}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgot_password valid email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'Email sent successfully'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Email sent successfully\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"akherebecca@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/forgot-password",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgot_password: incorrect email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'User not found'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User not found\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"khwfyuwgugyf@jhwedw.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}api/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset password using token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'Admin Password Updated Successfully, please proceed to login'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Admin Password Updated Successfully,please proceed to login\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\": \"akherebecca@gmail.com\",\r\n  \"password\": \"Akhere1234#\",\r\n  \"reset_token\":\"3b8bd3a0-c67e-4031-86fd-2a47148c9ec3\"\r\n\r\n   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}api/v1/auth/reset-password",
+							"host": [
+								"{{baseUrl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset password using invalid token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'Admin Password Updated Successfully, please proceed to login'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"pasword reset request not found\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\": \"akherebecca@gmail.com\",\r\n  \"password\": \"Akhere1234#\",\r\n  \"reset_token\":\"3b8bd3a0-c67e-4031-86fd-2a47148c9ec3@@\"\r\n\r\n   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}api/v1/auth/reset-password",
+							"host": [
+								"{{baseUrl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Admin photo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The response contains a message key with the value 'Picture updated successfully'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Picture updated successfully\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "image/png",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1f00d50c-70e6-4700-976e-aa253167280e"
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/photo_upload",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"photo_upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Admin photo_ unsupported format",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\" The response includes a message key with value of 'Invalid file type. Only JPEG and PNG are allowed.'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Invalid file type. Only JPEG and PNG are allowed.\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJlY2Nhb2x1c2VndW5AZ21haWwuY29tIiwic3ViIjoiOTY0MTFlNjQtOTQxZC00N2VlLWIzYTUtZGRmZDQ0N2MzOGQ2IiwiaWF0IjoxNzQzMjMxMTgzLCJleHAiOjE3NDU4MjMxODN9.M6x_2r4e8T37_FOdrIkqlleGWIY8sr3lxi4rhGkY2Fs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "image/png",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1f00a43c-991f-4d80-a7b4-4e5b4e09ead4"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/users/photo_upload",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"users",
+								"photo_upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'Admin Password Updated Successfully,please proceed to login'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Admin Password Updated Successfully,please proceed to login\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"old_password\": \"Becca123#\",\r\n  \"new_password\": \"Becca12#\"\r\n  \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/change-password",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update  unauthenticated user password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'Not an authenticated user '\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"Not an authenticated user\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"old_password\": \"Becca1234#\",\r\n    \"new_password\": \"Akhere12345$\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/change-password",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update payment user details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"The response contains a message key with the value 'User subscription payment successful'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message).to.eql(\"User subscription payment successful\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"plan\": \"BASIC\",\r\n  \"billing_interval\": \"monthly\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/96411e64-941d-47ee-b3a5-ddfd447c38d6/subscription-payment",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"96411e64-941d-47ee-b3a5-ddfd447c38d6",
+								"subscription-payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing field__update user subscription details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonResponse=pm.response.json();\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"The response includes a message key with the value 'User deleted successfully'\",function () {\r",
+									"    const jsonResponse = pm.response.json();\r",
+									"    pm.expect(jsonResponse).to.have.property(\"message\")\r",
+									"    pm.expect(jsonResponse.message[0]).to.eql(\"plan should not be empty\")\r",
+									"    pm.expect(jsonResponse.message[2]).to.eql(\"billing_interval should not be empty\")\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}api/v1/auth/96411e64-941d-47ee-b3a5-ddfd447c38d6/subscription-payment",
+							"host": [
+								"{{baseURL}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"96411e64-941d-47ee-b3a5-ddfd447c38d6",
+								"subscription-payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create_Sucess_Initiate OAuth",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "header",
+								"value": "*/*",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"id_token\": \"eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyMWYzYmM2NmYwNzUxZjc4NDA2MDY3OTliMWFkZjllOWZiNjBkZmIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDY5Mjg3MjEwMDExNzQ1MjM2MTMiLCJlbWFpbCI6ImthcmVlbXRlbWl0b3BlMTQyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoidklhcFE5T29XUkJsZFhUTkZObDdZZyIsIm5hbWUiOiJUZW1pdG9wZSBLYXJlZW0iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSjRtTVNJMjNPdjlHQ2NzQkhJZWdlWU4wajhqeTRqWjJ6NmE0OUJ0MzBxQzV6Vk9JMD1zOTYtYyIsImdpdmVuX25hbWUiOiJUZW1pdG9wZSIsImZhbWlseV9uYW1lIjoiS2FyZWVtIiwiaWF0IjoxNzQzMjgzODY0LCJleHAiOjE3NDMyODc0NjR9.dsULgGMUTV7PaxsFw4mcwHZ0QUMMGjDNMdfP06DAjUjG1QUvzE-2n04R6mnppxwR7L76lndZluxZrKiahefQCfVptnHuzXVRKbC0ES7O2wWZJBYqledAgh__bEQkSK6ofpjphgi6QQefhQY6_Ut0u9Di48ay5opGnXSqy3hnoMR0luZIj2UIr-MKzmHkI5EZjAnpDp-lWxhyoCpw8jdqX7CGpyaKm5-LNW0Gu1i7utIuNAk301fVS8KvfGTglo9nQL1vWeROxHgyAJemduXJiPZ1bdmfO6qruIUv_fa0ySQe4KThR9IJMhSYTNsIDP6v9KOZYgLEYYELHK5wjbdwUA\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.staging.resolve.vote/api/v1/auth/google/google",
+							"protocol": "https",
+							"host": [
+								"api",
+								"staging",
+								"resolve",
+								"vote"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"google",
+								"google"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Election",
+			"item": [
+				{
+					"name": "Create_Election",
+					"item": [
+						{
+							"name": "Create_Election_Authorized_User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse=pm.response.json();\r",
+											"pm.test(\"The status code for the response is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})\r",
+											"pm.test(\"The response includes a message key with a value of 'Election creation successful'\",()=>{\r",
+											"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+											"    pm.expect(jsonResponse.message).to.eql(\"Election creation successful\");\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Class prefect\",\r\n  \"description\": \"Election to choose the next prefect.\",\r\n  \"start_date\": \"2025-03-26\",\r\n  \"end_date\": \"2025-03-26\",\r\n  \"start_time\": \"18:00:00\",\r\n  \"end_time\": \"18:05:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Candidate A\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate B\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/elections",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "valid all required",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"RESOLVE Election 2025\",\r\n  \"description\": \"Election to choose the next team lead.\",\r\n  \"start_date\": \"2025-06-01\",\r\n  \"end_date\": \"2025-06-02\",\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Candidate A\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate B\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/elections",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"elections"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "nginx/1.24.0 (Ubuntu)"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 17 Mar 2025 05:30:41 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "624"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"270-8BDrVg+q/3h7fejDQohinDF9GE8\""
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status_code\": 201,\n    \"message\": \"Election creation successful\",\n    \"data\": {\n        \"election_id\": \"43b3c2c5-8bd7-4655-b77c-627a86dd6255\",\n        \"title\": \"RESOLVE Election 2025\",\n        \"description\": \"Election to choose the next team lead.\",\n        \"start_date\": \"2025-06-01T00:00:00.000Z\",\n        \"end_date\": \"2025-06-02T00:00:00.000Z\",\n        \"start_time\": \"09:00:00\",\n        \"end_time\": \"10:00:00\",\n        \"vote_id\": \"07359764-aec2-480a-adfd-598aa2eb3c17\",\n        \"max_choices\": 1,\n        \"election_type\": \"singlechoice\",\n        \"created_by\": \"75317e98-3a13-464c-83fe-ffc1e877933f\",\n        \"candidates\": [\n            {\n                \"name\": \"Candidate A\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate B\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            }\n        ]\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Create_Election_Unathorized_User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 401\",()=>{\r",
+											"    pm.response.to.have.status(401);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Presidential Election 2025\",\r\n  \"description\": \"Election to choose the next president.\",\r\n  \"start_date\": \"2025-06-01\",\r\n  \"end_date\": \"2025-06-02\",\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_Missingfield",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"\",\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_One_Missing_Field",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track\",\r\n  \"description\": \"\",\r\n  \"start_date\": \"2025-03-28\",\r\n  \"end_date\": \"2025-03-28\",\r\n  \"start_time\": \"11:00:00\",\r\n  \"end_time\": \"11:30:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Phillip\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Andrew\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_FutureDate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track\",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2030-01-01\",\r\n  \"end_date\": \"2030-01-01\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"12:0:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Phillip\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Andrew\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_PastDate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"RESOLVE Election 2025\",\r\n   \"description\": \"Election to choose the next president.\",\r\n  \"start_date\": \"2025-06-01T00:00:00Z\", //june\r\n  \"end_date\": \"2025-05-01T00:00:00Z\", //may\r\n  \"start_time\": \"00:00:00\",\r\n  \"end_time\": \"23:59:59\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_Same_Starttime_and_Endtime",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbWl0b3Bla2FyZWVtMTQyQGdtYWlsLmNvbSIsInN1YiI6IjU3NDBkN2Q4LTgzNDUtNDYxZS1hMmRmLTRkYmM1OWQwMzExNSIsImlhdCI6MTc0MzE1MzE3NywiZXhwIjoxNzQ1NzQ1MTc3fQ.vqXP2Pn8KmYy9T5J2MKpVnuJ--VBN4zkkOMNZ9209S8",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track\",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-30\",\r\n  \"end_date\": \"2025-03-30\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"08:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Phillip\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Andrew\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_StartTime_After_EndTime",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-30\",\r\n  \"election_access_type\": \"close\",\r\n  \"end_date\": \"2025-03-30\",\r\n  \"start_time\": \"17:35:00\",\r\n  \"end_time\": \"16:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Phillip\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Andrew\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Closed_Election(Private)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"title\": \"Elect\", //at least 5 characters\r\n  \"description\": \"Election for 2025.\", //at least 15 characters\r\n  \"start_date\": \"2025-06-01T00:00:00Z\",\r\n  \"end_date\": \"2025-06-02T00:00:00Z\",\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Open_Election(Public)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"HNG Internship Election 2025 – Selecting Team Lead & Assistant Team Leads for Team Resolve\",  //at most 100 characters --90 characters\r\n  \"description\": \"This election is conducted as part of the HNG Internship program towards stage six to select the next set of leaders for Team Resolve. The voting process will determine the primary team lead and assistant team leads who will be responsible for coordinating tasks, guiding team members, and ensuring smooth collaboration within the team. All candidates, product managers, have been nominated based on their contributions, leadership skills, and ability to drive innovation. All interns in Team Resolve are encouraged to participate by casting their votes to ensure fair representation. The election period will be open from March 8, 2025, to March 9, 2025, and results will be announced shortly after. Your vote plays a crucial role in shaping the leadership of Team Resolve, and we urge every eligible voter to participate actively. Choose wisely and help select the best leaders who will drive success and teamwork throughout the HNG internship journey.\", //at most 1000 characters -- 954 characters\r\n  \"start_date\": \"2025-06-01T00:00:00Z\",\r\n  \"end_date\": \"2025-06-02T00:00:00Z\",\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_NoCandidate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"A\",\r\n  \"description\": \"A\",\r\n  \"start_date\": \"2025-06-01T00:00:00Z\",\r\n  \"end_date\": \"2025-06-02T00:00:00Z\",\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_MinCandidate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-28\",\r\n  \"end_date\": \"2025-03-28\",\r\n  \"election_access_type\": \"close\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"A\",\r\n      \"photo_url\": \"\"\r\n    },\r\n    {\r\n      \"name\": \"\",\r\n      \"photo_url\": \"\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_MaxCandidates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-29\",\r\n  \"end_date\": \"2025-03-29\",\r\n  \"election_access_type\": \"close\",\r\n  \"start_time\": \"12:00:00\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"AB\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"ZA\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"DE\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"FA\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"UE\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"XO\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"KP\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"GI\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"QL\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"JJ\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"BR\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"TE\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"WA\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"LO\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"ER\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"KE\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n      \r\n    },\r\n    {\r\n      \"name\": \"OG\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n      \r\n    }\r\n\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_SameCandidate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbWl0b3Bla2FyZWVtMTQyQGdtYWlsLmNvbSIsInN1YiI6IjU3NDBkN2Q4LTgzNDUtNDYxZS1hMmRmLTRkYmM1OWQwMzExNSIsImlhdCI6MTc0MzE1MzE3NywiZXhwIjoxNzQ1NzQ1MTc3fQ.vqXP2Pn8KmYy9T5J2MKpVnuJ--VBN4zkkOMNZ9209S8",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-29\",\r\n  \"end_date\": \"2025-03-29\",\r\n  \"election_access_type\": \"close\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"Adebayo Aderibigbe\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Adebayo Aderibigbe\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_InvalidTime",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 400\",()=>{\r",
+											"    pm.response.to.have.status(400);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accesstoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"RESOLVE Election 2025\",\r\n   \"description\": \"Election to choose the next president.\",\r\n  \"start_date\": \"8th March, 2025\",\r\n  \"end_date\": 10,\r\n  \"start_time\": \"09:00:00\",\r\n  \"end_time\": \"10:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    \"Candidate A\",\r\n    \"Candidate B\"\r\n  ]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}api/v1/elections",
+									"host": [
+										"{{baseUrl}}api"
+									],
+									"path": [
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create_Election_Single_Choice",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse=pm.response.json();\r",
+											"pm.test(\"The status code for the response is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})\r",
+											"pm.test(\"The response includes a message key with a value of 'Election creation successful'\",()=>{\r",
+											"    pm.expect(jsonResponse).to.have.property(\"message\");\r",
+											"    pm.expect(jsonResponse.message).to.eql(\"Election creation successful\");\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-29\",\r\n  \"end_date\": \"2025-03-29\",\r\n  \"election_access_type\": \"close\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"Adebayo Aderibigbe\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Election_Create_MultipleChoice_Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"Presidential Election 2025\",\r\n  \"description\": \"Election to choose the next president.\",\r\n  \"start_date\": \"2025-03-18\",\r\n  \"end_date\": \"2025-03-18\",\r\n  \"start_time\": \"10:50:00\",\r\n  \"end_time\": \"12:00:00\",\r\n  \"election_type\": \"multiplechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Candidate A\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate B\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate C\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate D\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate E\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate F\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/elections",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"elections"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "nginx/1.24.0 (Ubuntu)"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 18 Mar 2025 09:47:47 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "887"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"377-G+dEQapcCkl44+OxCcdGFH3oik8\""
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status_code\": 201,\n    \"message\": \"Election creation successful\",\n    \"data\": {\n        \"election_id\": \"d5b97b02-f81d-4fb5-9918-c20969eb4a4a\",\n        \"title\": \"Presidential Election 2025\",\n        \"description\": \"Election to choose the next president.\",\n        \"start_date\": \"2025-03-18T00:00:00.000Z\",\n        \"end_date\": \"2025-03-18T00:00:00.000Z\",\n        \"start_time\": \"10:50:00\",\n        \"end_time\": \"12:00:00\",\n        \"vote_id\": \"20296054-3aa1-4239-8d45-f02bbd7f4786\",\n        \"max_choices\": 3,\n        \"election_type\": \"multiplechoice\",\n        \"created_by\": \"800b021e-56ed-4c65-990a-d9a550b6421f\",\n        \"candidates\": [\n            {\n                \"name\": \"Candidate A\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate B\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate C\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate D\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate E\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            },\n            {\n                \"name\": \"Candidate F\",\n                \"photo_url\": \"https://from-s3-bucket.com\"\n            }\n        ]\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Create_Election_MultipleChoice_SameChoiceCandidates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonResponse= pm.response.json();\r",
+											"pm.test(\"The status code is 201\",()=>{\r",
+											"    pm.response.to.have.status(201);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-29\",\r\n  \"end_date\": \"2025-03-29\",\r\n  \"election_access_type\": \"close\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"singlechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"Adebayo Aderibigbe\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.staging.resolve.vote/api/v1/elections",
+									"protocol": "https",
+									"host": [
+										"api",
+										"staging",
+										"resolve",
+										"vote"
+									],
+									"path": [
+										"api",
+										"v1",
+										"elections"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Election_Create_MultipleChoice_Fail_SameChoiceCandidates",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"Presidential Election 2025\",\r\n  \"description\": \"Election to choose the next president.\",\r\n  \"start_date\": \"2025-03-18\",\r\n  \"end_date\": \"2025-03-18\",\r\n  \"start_time\": \"11:00:00\",\r\n  \"end_time\": \"12:00:00\",\r\n  \"election_type\": \"multiplechoice\",\r\n  \"max_choices\": 3,\r\n  \"candidates\": [\r\n    {\r\n      \"name\": \"Candidate A\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate B\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Candidate C\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/elections",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"elections"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "nginx/1.24.0 (Ubuntu)"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 18 Mar 2025 09:58:51 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "81"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"51-eaQLc6yYPG5roWEKXkE0yhUcJe8\""
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status_code\": 400,\n    \"message\": \"Total candidates must exceed the maximum choices.\"\n}"
+								},
+								{
+									"name": "Create_Election_MultipleChoice_SameChoiceCandidates",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"Team Lead of Track \",\r\n  \"description\": \"New Track Lead for the Team.\",\r\n  \"start_date\": \"2025-03-29\",\r\n  \"end_date\": \"2025-03-29\",\r\n  \"election_access_type\": \"close\",\r\n  \"start_time\": \"08:00:00\",\r\n  \"end_time\": \"18:00:00\",\r\n  \"election_type\": \"multiplechoice\",\r\n  \"max_choices\": 1,\r\n  \"candidates\": [ \r\n    {\r\n      \"name\": \"Adebayo Aderibigbe\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n    {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    },\r\n     {\r\n      \"name\": \"Aderibigbe Alabi\",\r\n      \"photo_url\": \"https://from-s3-bucket.com\"\r\n    }\r\n  ],\r\n  \"email_notification\": true\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.staging.resolve.vote/api/v1/elections",
+											"protocol": "https",
+											"host": [
+												"api",
+												"staging",
+												"resolve",
+												"vote"
+											],
+											"path": [
+												"api",
+												"v1",
+												"elections"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "nginx/1.24.0 (Ubuntu)"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 23:46:12 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1136"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"470-oSXNyotQ9zd7yqwWeDFu8XjIuZQ\""
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status_code\": 201,\n    \"message\": \"Election creation successful\",\n    \"data\": {\n        \"election_id\": \"00a50e43-8b7a-421f-b506-41cf584141a3\",\n        \"title\": \"Team Lead of Track \",\n        \"description\": \"New Track Lead for the Team.\",\n        \"start_date\": \"2025-03-29T00:00:00.000Z\",\n        \"end_date\": \"2025-03-29T00:00:00.000Z\",\n        \"start_time\": \"08:00:00\",\n        \"end_time\": \"18:00:00\",\n        \"vote_id\": \"null\",\n        \"max_choices\": 1,\n        \"election_type\": \"multiplechoice\",\n        \"election_access_type\": \"close\",\n        \"created_by\": \"5740d7d8-8345-461e-a2df-4dbc59d03115\",\n        \"candidates\": [\n            {\n                \"name\": \"Adebayo Aderibigbe\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            },\n            {\n                \"name\": \"Aderibigbe Alabi\",\n                \"photo_url\": \"https://from-s3-bucket.com\",\n                \"bio\": \"\",\n                \"email\": \"\"\n            }\n        ],\n        \"email_notification\": true\n    }\n}"
+								}
+							]
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbWl0b3Bla2FyZWVtMTQyQGdtYWlsLmNvbSIsInN1YiI6IjU3NDBkN2Q4LTgzNDUtNDYxZS1hMmRmLTRkYmM1OWQwMzExNSIsImlhdCI6MTc0MzE1MzE3NywiZXhwIjoxNzQ1NzQ1MTc3fQ.vqXP2Pn8KmYy9T5J2MKpVnuJ--VBN4zkkOMNZ9209S8",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbWl0b3Bla2FyZWVtMTQyQGdtYWlsLmNvbSIsInN1YiI6IjU3NDBkN2Q4LTgzNDUtNDYxZS1hMmRmLTRkYmM1OWQwMzExNSIsImlhdCI6MTc0MzE1MzE3NywiZXhwIjoxNzQ1NzQ1MTc3fQ.vqXP2Pn8KmYy9T5J2MKpVnuJ--VBN4zkkOMNZ9209S8",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://api.staging.resolve.vote/",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJheWJheUBnbWFpbC5jb20iLCJzdWIiOiIzZDNmNzJkNC0yNmQ5LTQzYjQtYTlhOC1hMjhmZDk5MzczOGUiLCJpYXQiOjE3NDMxNTE2MjEsImV4cCI6MTc0NTc0MzYyMX0.v0F2SH_Hu0dbbdCYYBaAhdq99jqKugkC-PcnUfLlOLM"
+		},
+		{
+			"key": "baseUrl",
+			"value": "https://api.staging.resolve.vote/",
+			"type": "default"
+		},
+		{
+			"key": "newEmail",
+			"value": ""
+		},
+		{
+			"key": "37676d8e-2ee7-46e6-9328-4a5127fc63d7",
+			"value": ""
+		},
+		{
+			"key": "useriddelete",
+			"value": ""
+		},
+		{
+			"key": "useridvariable",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
