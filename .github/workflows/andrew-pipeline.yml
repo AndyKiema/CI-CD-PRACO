@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-report
-          path: newman/*.json  # Adjust if you want to upload your reports differently
+          path: C:\Users\Administrator\Desktop\CICD TEST\ResolveNewmanReport.json 
